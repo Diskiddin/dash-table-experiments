@@ -255,7 +255,7 @@ class DataTable extends Component {
             )
         });
     }
-	
+
 	updateInputValue(evt) {
 		this.setState({
 		inputValue: evt.target.value
@@ -323,7 +323,7 @@ class DataTable extends Component {
                 }
             };
         }
-		
+
 		function testFunction() {
 			let csvContent = "data:text/csv;charset=utf-8,";
 			for(var i in this.props.rows) {
@@ -340,21 +340,35 @@ class DataTable extends Component {
 			var encodedUri = encodeURI(csvContent);
 			return encodedUri
 		}
-		
-		let csvContent = "data:text/csv;charset=utf-8,";
-			for(var i in this.props.rows) {
-				let rowStr = ''
-				let row = this.props.rows[i]
-				for(var property in row) {
-					if(row.hasOwnProperty(property)) {
-						rowStr += row[property] + ','
-					}
-				}
-				rowStr = rowStr.substring(0, rowStr.length - 1)
-				csvContent += rowStr + "\r\n";
-			}
-		var encodedUri = encodeURI(csvContent);
 
+		let csvContent = "data:text/csv;charset=utf-8,";
+    if (this.state.rows) {
+      for(var i in this.props.rows) {
+        let rowStr = ''
+        let row = this.props.rows[i]
+        for(var property in row) {
+          if(row.hasOwnProperty(property)) {
+            rowStr += row[property] + ','
+          }
+        }
+        rowStr = rowStr.substring(0, rowStr.length - 1)
+        csvContent += rowStr + "\r\n";
+      }
+    }
+		var encodedUri = encodeURI(csvContent);
+    csvContent = "data:text/csv;charset=utf-8,";
+    for(var i in this.state.rows) {
+      let rowStr = ''
+      let row = this.state.rows[i]
+      for(var property in row) {
+        if (row.hasOwnProperty(property)) {
+          rowStr += row[property] + ','
+        }
+      }
+      rowStr = rowStr.substring(0, rowStr.length - 1)
+      csvContent += rowStr + "\r\n";
+    }
+    var encodedUriFiltered = encodeURI(csvContent);
         return  (
 			<div>
             <ReactDataGrid
@@ -375,6 +389,7 @@ class DataTable extends Component {
             />
 			<input value={this.state.inputValue} onChange={ evt => this.updateInputValue(evt)} placeholder="Download File Name"/>
 			<a href={encodedUri} download={this.state.inputValue + ".csv"}><button>Download csv</button></a>
+      <a href={encodedUriFiltered} download={this.state.inputValue + '.csv'}><button>Download Filtered csv</button></a>
 			</div>
         );
     }
