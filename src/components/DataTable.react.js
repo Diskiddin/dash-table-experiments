@@ -342,21 +342,26 @@ class DataTable extends Component {
 		}
 
 		let csvContent = "data:text/csv;charset=utf-8,";
-    if (this.state.rows) {
-      for(var i in this.props.rows) {
-        let rowStr = ''
-        let row = this.props.rows[i]
-        for(var property in row) {
-          if(row.hasOwnProperty(property)) {
-            rowStr += row[property] + ','
-          }
+    let columnsStr =  '';
+    for(var col in columns) {
+      columnsStr += columns[col]['name'] + ',';
+    }
+    var csvContentWithHeaders = csvContent + columnsStr;
+    csvContentWithHeaders = csvContentWithHeaders.substring(0, csvContentWithHeaders.length - 1) + '\r\n'
+    csvContent = csvContentWithHeaders
+    for(var i in this.props.rows) {
+      let rowStr = ''
+      let row = this.props.rows[i]
+      for(var property in row) {
+        if(row.hasOwnProperty(property)) {
+          rowStr += row[property] + ','
         }
-        rowStr = rowStr.substring(0, rowStr.length - 1)
-        csvContent += rowStr + "\r\n";
       }
+      rowStr = rowStr.substring(0, rowStr.length - 1)
+      csvContent += rowStr + "\r\n";
     }
 		var encodedUri = encodeURI(csvContent);
-    csvContent = "data:text/csv;charset=utf-8,";
+    csvContent = csvContentWithHeaders
     for(var i in this.state.rows) {
       let rowStr = ''
       let row = this.state.rows[i]
@@ -369,6 +374,19 @@ class DataTable extends Component {
       csvContent += rowStr + "\r\n";
     }
     var encodedUriFiltered = encodeURI(csvContent);
+    csvContent = csvContentWithHeaders
+    for(var i in selected_row_indices) {
+      let rowStr = ''
+      let row = this.state.rows[selected_row_indices[i]]
+      for(var prop in row) {
+        if (row.hasOwnProperty(prop)) {
+          rowStr += row[prop] + ','
+        }
+      }
+      rowStr = rowStr.substring(0, rowStr.length - 1)
+      csvContent += rowStr + '\r\n';
+    }
+    var encodedUriSelected = encodeURI(csvContent);
         return  (
 			<div>
             <ReactDataGrid
@@ -388,8 +406,9 @@ class DataTable extends Component {
 
             />
 			<input value={this.state.inputValue} onChange={ evt => this.updateInputValue(evt)} placeholder="Download File Name"/>
-			<a href={encodedUri} download={this.state.inputValue + ".csv"}><button>Download csv</button></a>
-      <a href={encodedUriFiltered} download={this.state.inputValue + '.csv'}><button>Download Filtered csv</button></a>
+			<a href={encodedUri} download={this.state.inputValue + ".csv"}><button>Download All Rows</button></a>
+      <a href={encodedUriFiltered} download={this.state.inputValue + '.csv'}><button>Download Filtered Rows</button></a>
+      <a href={encodedUriSelected} download={this.state.inputValue + '.csv'}><button>Download Selected Rows</button></a>
 			</div>
         );
     }
